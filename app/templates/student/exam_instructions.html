@@ -1,0 +1,20 @@
+{% extends "base_app.html" %}
+{% block title %}Examination Instructions · {{ app_short_name }}{% endblock %}
+{% block page_heading %}Pre-Examination Briefing{% endblock %}
+
+{% block content %}
+<div id="instructions-container" style="max-width:860px;margin:0 auto;">
+  <div class="card card-body">
+    <div class="skeleton" style="height:28px;width:55%;margin-bottom:14px;"></div>
+    <div class="skeleton" style="height:18px;width:35%;margin-bottom:24px;"></div>
+    <div class="skeleton" style="height:140px;"></div>
+  </div>
+</div>
+
+<script id="instructions-page-state" type="application/json">{{ {"examId": exam_id} | tojson }}</script>
+{% endblock %}
+
+{% block page_scripts %}
+<script type="module" src="{{ url_for('static', filename='js/pages/examInstructions.js') }}"></script>
+{% endblock %}
+

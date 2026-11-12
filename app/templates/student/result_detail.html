@@ -1,0 +1,19 @@
+{% extends "base_app.html" %}
+{% block title %}Detailed Result Report · {{ app_short_name }}{% endblock %}
+{% block page_heading %}Official Examination Result Report{% endblock %}
+
+{% block content %}
+<div id="result-detail-root" style="max-width:940px;margin:0 auto;">
+  <div class="card card-body">
+    <div class="skeleton" style="height:120px;margin-bottom:18px;"></div>
+    <div class="skeleton" style="height:240px;"></div>
+  </div>
+</div>
+
+<script id="result-detail-state" type="application/json">{{ {"resultId": result_id} | tojson }}</script>
+{% endblock %}
+
+{% block page_scripts %}
+<script type="module" src="{{ url_for('static', filename='js/pages/studentResultDetail.js') }}"></script>
+{% endblock %}
+

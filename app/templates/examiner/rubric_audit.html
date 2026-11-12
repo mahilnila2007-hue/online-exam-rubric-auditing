@@ -1,0 +1,144 @@
+{% extends "base_app.html" %}
+{% block title %}Intelligent Rubric Auditing · {{ app_short_name }}{% endblock %}
+{% block page_heading %}Intelligent Rubric Auditing &amp; Gap Detection{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Intelligent Rubric Auditing Mechanism</h1>
+    <p>Detect potential alternative phrasing in descriptive answers, review semantic confidence scores, and refine rubrics with full version &amp; re-evaluation traceability.</p>
+  </div>
+  <div class="flex items-center gap-2 flex-wrap">
+    <button type="button" id="audit-refresh-btn" class="btn btn-secondary">Refresh</button>
+  </div>
+</div>
+
+<!-- Audit Runner Bar -->
+<section class="card mb-6">
+  <div class="card-body">
+    <div class="flex items-end justify-between gap-4 flex-wrap">
+      <div class="form-group" style="flex:1;min-width:240px;">
+        <label class="form-label" for="run-audit-exam-select">Examination to Audit (Descriptive Questions)</label>
+        <select id="run-audit-exam-select" class="form-select">
+          <option value="">Select an examination...</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="width:240px;">
+        <label class="form-label" for="audit-threshold-range">
+          <span>Confidence Threshold</span>
+          <span class="mono fw-semibold" id="audit-threshold-label">56%</span>
+        </label>
+        <input id="audit-threshold-range" type="range" min="0.45" max="0.85" step="0.02" value="0.56" style="accent-color:var(--brand-accent);width:100%;">
+      </div>
+
+      <button type="button" id="run-audit-btn" class="btn btn-primary btn-lg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        <span>Run Intelligent Rubric Audit</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- KPI Overview -->
+<section class="kpi-grid mb-6">
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Pending Review</div>
+      <div class="kpi-value" id="aud-kpi-pending">—</div>
+      <div class="kpi-meta">Potential rubric gaps awaiting decision</div>
+    </div>
+    <div class="kpi-icon kpi-icon-amber">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Approved Phrases</div>
+      <div class="kpi-value" id="aud-kpi-approved">—</div>
+      <div class="kpi-meta">Added to rubrics &amp; re-evaluated</div>
+    </div>
+    <div class="kpi-icon kpi-icon-green">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Rejected</div>
+      <div class="kpi-value" id="aud-kpi-rejected">—</div>
+      <div class="kpi-meta">Original rubric preserved</div>
+    </div>
+    <div class="kpi-icon kpi-icon-blue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Affected Submissions</div>
+      <div class="kpi-value" id="aud-kpi-affected">—</div>
+      <div class="kpi-meta">Total flagged student attempts</div>
+    </div>
+    <div class="kpi-icon kpi-icon-violet">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+    </div>
+  </div>
+</section>
+
+<!-- Workspace Tabs & Filters -->
+<div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+  <div class="tabs" id="audit-main-tabs">
+    <button type="button" class="tab-btn active" data-audit-tab="suggestions">Rubric Gap Suggestions</button>
+    <button type="button" class="tab-btn" data-audit-tab="history">Audit History &amp; Versions</button>
+  </div>
+
+  <div class="flex items-center gap-2 flex-wrap" id="audit-filter-bar">
+    <select id="filter-audit-status" class="form-select" style="width:auto;">
+      <option value="">All Statuses</option>
+      <option value="pending">Pending Review</option>
+      <option value="approved">Approved</option>
+      <option value="rejected">Rejected</option>
+    </select>
+    <select id="filter-audit-exam" class="form-select" style="width:auto;max-width:220px;">
+      <option value="">All Examinations</option>
+    </select>
+    <select id="filter-audit-criterion" class="form-select" style="width:auto;max-width:220px;">
+      <option value="">All Criteria</option>
+    </select>
+  </div>
+</div>
+
+<!-- Tab 1: Rubric Gap Cards -->
+<section id="audit-panel-suggestions" style="display:grid;gap:1rem;">
+  <div class="card card-body"><div class="skeleton" style="height:140px;"></div></div>
+</section>
+
+<!-- Tab 2: Audit History & Rubric Versions -->
+<section id="audit-panel-history" class="card hidden">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">Complete Rubric Audit &amp; Re-evaluation History</h2>
+      <p class="card-subtitle">Immutable ledger of audit executions, rubric version snapshots, approvals, rejections, and score updates.</p>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Event</th>
+          <th>Responsible User</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody id="audit-history-tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<script id="rubric-audit-state" type="application/json">{{ {"initialExamId": initial_exam_id} | tojson }}</script>
+{% endblock %}
+
+{% block page_scripts %}
+<script type="module" src="{{ url_for('static', filename='js/pages/rubricAudit.js') }}"></script>
+{% endblock %}
+

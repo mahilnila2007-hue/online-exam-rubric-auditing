@@ -1,0 +1,108 @@
+{% extends "base_app.html" %}
+{% block title %}Examiner Dashboard · {{ app_short_name }}{% endblock %}
+{% block page_heading %}Examiner Command Studio{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Examiner Workspace</h1>
+    <p>Create examinations, manage rubric-backed descriptive &amp; MCQ questions, and inspect student submissions.</p>
+  </div>
+  <div class="flex items-center gap-2 flex-wrap">
+    <a href="{{ url_for('pages.question_bank_page') }}" class="btn btn-secondary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span>Question &amp; Rubric Bank</span>
+    </a>
+    <a href="{{ url_for('pages.exam_create_page') }}" class="btn btn-primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>New Examination</span>
+    </a>
+  </div>
+</div>
+
+<section class="kpi-grid mb-6">
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Total Exams</div>
+      <div class="kpi-value" id="ex-kpi-exams">—</div>
+      <div class="kpi-meta">Created examinations</div>
+    </div>
+    <div class="kpi-icon kpi-icon-blue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Published / Live</div>
+      <div class="kpi-value" id="ex-kpi-live">—</div>
+      <div class="kpi-meta">Visible to students</div>
+    </div>
+    <div class="kpi-icon kpi-icon-green">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Question Bank</div>
+      <div class="kpi-value" id="ex-kpi-questions">—</div>
+      <div class="kpi-meta" id="ex-kpi-rubrics">Loading rubrics...</div>
+    </div>
+    <div class="kpi-icon kpi-icon-violet">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Submissions</div>
+      <div class="kpi-value" id="ex-kpi-submissions">—</div>
+      <div class="kpi-meta">Ready for review</div>
+    </div>
+    <div class="kpi-icon kpi-icon-amber">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+    </div>
+  </div>
+</section>
+
+<div class="card">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">Your Examinations</h2>
+      <p class="card-subtitle">Manage publication status, schedules, and student submissions.</p>
+    </div>
+    <div class="flex items-center gap-2 flex-wrap">
+      <input id="examiner-exam-search" type="search" class="form-input" placeholder="Search title or course code..." style="width:220px;">
+      <select id="examiner-status-filter" class="form-select" style="width:auto;min-width:150px;">
+        <option value="">All Statuses</option>
+        <option value="published">Published</option>
+        <option value="scheduled">Scheduled</option>
+        <option value="draft">Draft</option>
+        <option value="archived">Archived</option>
+      </select>
+      <button type="button" id="examiner-refresh-btn" class="btn btn-secondary btn-sm">Refresh</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Examination</th>
+          <th>Schedule Window</th>
+          <th>Structure</th>
+          <th>Status</th>
+          <th>Submissions</th>
+          <th style="text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="examiner-exams-tbody">
+        <tr><td colspan="6"><div class="skeleton" style="height:44px;"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script type="module" src="{{ url_for('static', filename='js/pages/examinerDashboard.js') }}"></script>
+{% endblock %}
+

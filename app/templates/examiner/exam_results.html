@@ -1,0 +1,110 @@
+{% extends "base_app.html" %}
+{% block title %}Evaluation &amp; Results Console · {{ app_short_name }}{% endblock %}
+{% block page_heading %}Examination Processing &amp; Results{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="flex items-center gap-2 mb-1">
+      <span class="badge badge-brand mono" id="er-course-code">—</span>
+      <span class="text-xs text-muted" id="er-passing-meta"></span>
+    </div>
+    <h1 id="er-exam-title">Examination Results Console</h1>
+    <p>Run transparent preliminary rubric processing, review descriptive marks criterion-by-criterion, and publish official student results.</p>
+  </div>
+  <div class="flex items-center gap-2 flex-wrap">
+    <a href="{{ url_for('pages.examiner_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    <a href="/examiner/audit?exam_id={{ exam_id }}" class="btn btn-secondary">Rubric Audit</a>
+    <a href="/api/examiner/exams/{{ exam_id }}/results.csv" class="btn btn-secondary" download>Export CSV</a>
+    <button type="button" id="batch-eval-btn" class="btn btn-secondary">Run Preliminary Rubric Check</button>
+    <button type="button" id="publish-all-btn" class="btn btn-success">Publish Evaluated Results</button>
+  </div>
+</div>
+
+<section class="kpi-grid mb-6">
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Submissions</div>
+      <div class="kpi-value" id="er-kpi-total">—</div>
+      <div class="kpi-meta" id="er-kpi-pending">Loading...</div>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Evaluated</div>
+      <div class="kpi-value" id="er-kpi-evaluated">—</div>
+      <div class="kpi-meta">Ready for publication</div>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Published</div>
+      <div class="kpi-value" id="er-kpi-published">—</div>
+      <div class="kpi-meta">Visible to students</div>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Class Performance</div>
+      <div class="kpi-value" id="er-kpi-avg">—</div>
+      <div class="kpi-meta" id="er-kpi-pass-rate">Pass rate: —</div>
+    </div>
+  </div>
+</section>
+
+<div id="er-distribution-card" class="card mb-6 hidden">
+  <div class="card-body">
+    <div class="flex items-center justify-between gap-2 mb-3 flex-wrap">
+      <h2 class="card-title">Grade &amp; Outcome Distribution</h2>
+      <span class="text-xs text-muted" id="er-dist-meta">Evaluated candidate summary</span>
+    </div>
+    <div id="er-distribution-grid" class="dist-grid"></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">Candidate Submissions &amp; Results</h2>
+      <p class="card-subtitle">Click Evaluate / Review to inspect rubric criterion scores and modify marks.</p>
+    </div>
+    <div class="flex items-center gap-2 flex-wrap">
+      <input id="er-search" type="search" class="form-input" placeholder="Search name, ID, or email..." style="width:210px;">
+      <select id="er-filter-status" class="form-select" style="width:auto;">
+        <option value="">All Statuses</option>
+        <option value="pending_descriptive">Pending Rubric Grading</option>
+        <option value="preliminary_evaluated">Preliminary Checked</option>
+        <option value="evaluated">Evaluated / Completed</option>
+        <option value="published">Published Only</option>
+      </select>
+      <button type="button" id="er-refresh-btn" class="btn btn-secondary btn-sm">Refresh</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Candidate</th>
+          <th>MCQ</th>
+          <th>Descriptive</th>
+          <th>Total / %</th>
+          <th>Grade &amp; Pass</th>
+          <th>Evaluation</th>
+          <th>Publication</th>
+          <th style="text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="er-tbody">
+        <tr><td colspan="8"><div class="skeleton" style="height:46px;"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script id="exam-results-state" type="application/json">{{ {"examId": exam_id} | tojson }}</script>
+{% endblock %}
+
+{% block page_scripts %}
+<script type="module" src="{{ url_for('static', filename='js/pages/examResults.js') }}"></script>
+{% endblock %}
+

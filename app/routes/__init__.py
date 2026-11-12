@@ -1,0 +1,2 @@
+"""Flask routes package."""
+

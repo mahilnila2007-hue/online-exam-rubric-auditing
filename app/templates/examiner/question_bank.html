@@ -1,0 +1,108 @@
+{% extends "base_app.html" %}
+{% block title %}Question &amp; Rubric Bank · {{ app_short_name }}{% endblock %}
+{% block page_heading %}Question &amp; Rubric Repository{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Question &amp; Rubric Bank</h1>
+    <p>Author MCQ items and descriptive questions anchored to structured multi-criteria evaluation rubrics.</p>
+  </div>
+  <div class="flex items-center gap-2 flex-wrap">
+    <a href="/api/examiner/questions/excel-template" class="btn btn-secondary" download>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>Excel Template</span>
+    </a>
+    <button type="button" id="import-excel-btn" class="btn btn-secondary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span>Upload Excel Set</span>
+    </button>
+    <button type="button" id="new-rubric-btn" class="btn btn-secondary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span>New Rubric Template</span>
+    </button>
+    <button type="button" id="new-question-btn" class="btn btn-primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>Add Question</span>
+    </button>
+  </div>
+</div>
+
+<div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+  <div class="tabs" id="qb-tabs">
+    <button type="button" class="tab-btn active" data-qb-tab="questions">Questions</button>
+    <button type="button" class="tab-btn" data-qb-tab="rubrics">Evaluation Rubrics</button>
+  </div>
+
+  <div class="flex items-center gap-2 flex-wrap" id="qb-filters">
+    <input id="qb-search" type="search" class="form-input" placeholder="Search questions or set..." style="width:200px;">
+    <select id="qb-set-filter" class="form-select" style="width:auto;">
+      <option value="">All Sets</option>
+    </select>
+    <select id="qb-marks-filter" class="form-select" style="width:auto;">
+      <option value="">All Marks</option>
+      <option value="1">1 Mark</option>
+      <option value="2">2 Marks</option>
+      <option value="5">5 Marks</option>
+    </select>
+    <select id="qb-type-filter" class="form-select" style="width:auto;">
+      <option value="">All Types</option>
+      <option value="mcq">MCQ</option>
+      <option value="descriptive">Descriptive</option>
+    </select>
+    <select id="qb-difficulty-filter" class="form-select" style="width:auto;">
+      <option value="">All Difficulties</option>
+      <option value="easy">Easy</option>
+      <option value="medium">Medium</option>
+      <option value="hard">Hard</option>
+    </select>
+  </div>
+</div>
+
+<div id="qb-stats-strip" class="stat-strip mb-4"></div>
+
+<section id="qb-panel-questions" class="card">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Question Prompt</th>
+          <th>Subject / Topic</th>
+          <th>Type</th>
+          <th>Difficulty</th>
+          <th>Marks</th>
+          <th>Answer Key / Rubric</th>
+          <th style="text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="qb-questions-tbody">
+        <tr><td colspan="7"><div class="skeleton" style="height:44px;"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="qb-panel-rubrics" class="card hidden">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Rubric Title</th>
+          <th>Subject</th>
+          <th>Criteria</th>
+          <th>Total Marks</th>
+          <th>Model Answer</th>
+          <th>Version</th>
+          <th style="text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="qb-rubrics-tbody"></tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_scripts %}
+<script type="module" src="{{ url_for('static', filename='js/pages/questionBank.js') }}"></script>
+{% endblock %}
+

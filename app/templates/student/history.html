@@ -1,0 +1,54 @@
+{% extends "base_app.html" %}
+{% block title %}Examination History · {{ app_short_name }}{% endblock %}
+{% block page_heading %}Academic Examination History{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Examination History</h1>
+    <p>Review completed attempts, instant MCQ results, and descriptive rubric auditing statuses.</p>
+  </div>
+  <div class="flex items-center gap-2">
+    <a href="{{ url_for('pages.student_dashboard') }}" class="btn btn-secondary">Back to Examinations</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">Past Attempts</h2>
+      <p class="card-subtitle">Click View Breakdown on any submitted exam to inspect responses and rubric evaluations.</p>
+    </div>
+    <select id="history-status-filter" class="form-select" style="width:auto;">
+      <option value="">All Attempts</option>
+      <option value="completed">Fully Graded</option>
+      <option value="pending_descriptive">Pending Rubric Grading</option>
+      <option value="in_progress">In Progress</option>
+    </select>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Examination</th>
+          <th>Submitted</th>
+          <th>Questions Answered</th>
+          <th>MCQ Score</th>
+          <th>Evaluation Status</th>
+          <th>Rubric Audit</th>
+          <th style="text-align:right;">Details</th>
+        </tr>
+      </thead>
+      <tbody id="history-tbody">
+        <tr><td colspan="7"><div class="skeleton" style="height:44px;"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script type="module" src="{{ url_for('static', filename='js/pages/examHistory.js') }}"></script>
+{% endblock %}
+

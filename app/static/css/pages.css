@@ -1,0 +1,312 @@
+/* ==========================================================================
+   Page-Specific Polishing Styles
+   ========================================================================== */
+
+/* Login & Registration Split View */
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  background: var(--bg-surface);
+}
+
+.auth-showcase {
+  background: radial-gradient(circle at top right, #1d4ed8 0%, #0f172a 65%);
+  color: #ffffff;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-showcase::after {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.2), transparent 70%);
+  bottom: -140px;
+  right: -120px;
+  pointer-events: none;
+}
+
+.auth-hero-title {
+  font-size: 2.15rem;
+  line-height: 1.18;
+  color: #ffffff;
+  max-width: 520px;
+}
+
+.auth-hero-desc {
+  color: #cbd5e1;
+  font-size: 1rem;
+  max-width: 500px;
+  margin-top: 1rem;
+}
+
+.auth-feature-list {
+  display: grid;
+  gap: 0.95rem;
+  margin-top: 2rem;
+  max-width: 500px;
+}
+
+.auth-feature-item {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1.05rem;
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.auth-feature-item strong {
+  display: block;
+  font-size: 0.9rem;
+  color: #ffffff;
+}
+
+.auth-feature-item span {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+}
+
+.auth-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.25rem;
+  background: var(--bg-canvas);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: 2rem;
+}
+
+/* Student Exam Cards */
+.exam-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 1.15rem;
+}
+
+.exam-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.3rem;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.exam-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--brand-border);
+}
+
+.exam-meta-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.85rem 0;
+}
+
+.meta-pill {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  background: var(--bg-subtle);
+  padding: 0.25rem 0.58rem;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+
+/* Exam Attempt Interface */
+.timer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.42rem 0.85rem;
+  border-radius: var(--radius-full);
+  background: var(--brand-soft);
+  color: var(--brand-primary);
+  border: 1px solid var(--brand-border);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-pill.is-warning {
+  background: var(--warning-soft);
+  color: var(--warning);
+  border-color: var(--warning-border);
+}
+
+.timer-pill.is-critical {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-color: var(--danger-border);
+  animation: pulseBorder 1.2s infinite;
+}
+
+@keyframes pulseBorder {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.2); }
+  50% { box-shadow: 0 0 0 5px rgba(220, 38, 38, 0.08); }
+}
+
+.question-stage {
+  padding: 1.65rem;
+}
+
+.option-list {
+  display: grid;
+  gap: 0.72rem;
+  margin-top: 1.25rem;
+}
+
+.option-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 0.95rem 1.05rem;
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.option-card:hover {
+  border-color: #93c5fd;
+  background: #f8fbff;
+}
+
+.option-card.is-selected {
+  border-color: var(--brand-accent);
+  background: var(--brand-soft);
+  box-shadow: 0 0 0 1px var(--brand-accent);
+}
+
+.option-card input[type="radio"] {
+  margin-top: 0.2rem;
+  accent-color: var(--brand-accent);
+}
+
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+}
+
+.palette-btn {
+  height: 38px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-surface);
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.palette-btn.is-answered {
+  background: var(--success-soft);
+  border-color: var(--success-border);
+  color: var(--success);
+}
+
+.palette-btn.is-flagged::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--warning);
+}
+
+.palette-btn.is-current {
+  border-color: var(--brand-accent);
+  background: var(--brand-accent);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+}
+
+/* Rubric Builder & Picker Split */
+.editor-split {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.criterion-card {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  padding: 0.95rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.picker-list {
+  max-height: 460px;
+  overflow-y: auto;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.picker-item {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 0.85rem;
+  background: var(--bg-surface);
+  display: flex;
+  justify-content: space-between;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.picker-item.is-selected {
+  border-color: var(--brand-accent);
+  background: var(--brand-soft);
+}
+
+/* Confirmation Receipt */
+.receipt-card {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.receipt-banner {
+  background: linear-gradient(135deg, #059669, #047857);
+  color: #ffffff;
+  padding: 2rem;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  text-align: center;
+}
+
+@media (max-width: 960px) {
+  .auth-page {
+    grid-template-columns: 1fr;
+  }
+  .auth-showcase {
+    display: none;
+  }
+  .editor-split {
+    grid-template-columns: 1fr;
+  }
+}
+

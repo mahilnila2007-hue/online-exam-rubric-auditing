@@ -1,0 +1,211 @@
+{% extends "base_app.html" %}
+{% block title %}Admin Control Center · {{ app_short_name }}{% endblock %}
+{% block page_heading %}System Administration &amp; Governance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Administrative Control Center</h1>
+    <p>Manage Student &amp; Examiner accounts, monitor platform examinations, and audit system activity.</p>
+  </div>
+  <div class="flex items-center gap-2 flex-wrap">
+    <a href="/api/admin/reports/exams.csv" class="btn btn-secondary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>Export CSV Report</span>
+    </a>
+    <button type="button" id="admin-create-user-btn" class="btn btn-primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+      <span>Provision User</span>
+    </button>
+  </div>
+</div>
+
+<section class="kpi-grid mb-6">
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Total Accounts</div>
+      <div class="kpi-value" id="adm-kpi-users">—</div>
+      <div class="kpi-meta" id="adm-kpi-roles">Students · Examiners · Admins</div>
+    </div>
+    <div class="kpi-icon kpi-icon-blue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Examinations</div>
+      <div class="kpi-value" id="adm-kpi-exams">—</div>
+      <div class="kpi-meta" id="adm-kpi-live-exams">Active sessions</div>
+    </div>
+    <div class="kpi-icon kpi-icon-green">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Bank &amp; Rubrics</div>
+      <div class="kpi-value" id="adm-kpi-questions">—</div>
+      <div class="kpi-meta" id="adm-kpi-rubrics">Rubrics configured</div>
+    </div>
+    <div class="kpi-icon kpi-icon-violet">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Submissions</div>
+      <div class="kpi-value" id="adm-kpi-subs">—</div>
+      <div class="kpi-meta" id="adm-kpi-pending">Pending rubric review</div>
+    </div>
+    <div class="kpi-icon kpi-icon-amber">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+  </div>
+</section>
+
+<div id="admin-pending-banner" class="mb-4 hidden"></div>
+
+<div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+  <div class="tabs" id="admin-section-tabs">
+    <button type="button" class="tab-btn active" data-admin-tab="users">User Directory</button>
+    <button type="button" class="tab-btn" data-admin-tab="approvals" id="admin-approvals-tab-btn">Pending Staff Approvals</button>
+    <button type="button" class="tab-btn" data-admin-tab="exams">Examination Reports</button>
+    <button type="button" class="tab-btn" data-admin-tab="audit">Audit Activity Log</button>
+  </div>
+  <button type="button" id="admin-refresh-btn" class="btn btn-secondary btn-sm">Refresh Data</button>
+</div>
+
+<!-- Users Panel -->
+<section id="admin-panel-users" class="card">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">User Accounts</h2>
+      <p class="card-subtitle">Assign roles, suspend compromised accounts, or create Examiner and Student profiles.</p>
+    </div>
+    <div class="flex items-center gap-2 flex-wrap">
+      <input id="admin-user-search" type="search" class="form-input" style="width:220px;" placeholder="Search name or email..." aria-label="Search users">
+      <select id="admin-role-filter" class="form-select" style="width:auto;">
+        <option value="">All Roles</option>
+        <option value="student">Students</option>
+        <option value="examiner">Examiners</option>
+        <option value="admin">Admins</option>
+      </select>
+      <select id="admin-status-filter" class="form-select" style="width:auto;">
+        <option value="">All Statuses</option>
+        <option value="active">Active</option>
+        <option value="pending_approval">Pending Approval</option>
+        <option value="rejected">Rejected</option>
+        <option value="suspended">Suspended</option>
+      </select>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Institution ID</th>
+          <th>Department</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th style="text-align:right;">Manage</th>
+        </tr>
+      </thead>
+      <tbody id="admin-users-tbody">
+        <tr><td colspan="6"><div class="skeleton" style="height:44px;"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Pending Staff Approvals Panel -->
+<section id="admin-panel-approvals" class="card hidden">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">Staff Registration Verification Queue</h2>
+      <p class="card-subtitle">Verify Staff / Faculty IDs and approve or reject self-registered Examiner accounts before granting system access.</p>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Applicant</th>
+          <th>Staff / Faculty ID</th>
+          <th>Department</th>
+          <th>Registered</th>
+          <th>Status</th>
+          <th style="text-align:right;">Verify &amp; Decide</th>
+        </tr>
+      </thead>
+      <tbody id="admin-approvals-tbody">
+        <tr><td colspan="6"><div class="skeleton" style="height:44px;"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Exams Monitor Panel -->
+<section id="admin-panel-exams" class="card hidden">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">Examination Activity &amp; Analytics</h2>
+      <p class="card-subtitle">Cross-institution overview of exam participation, MCQ averages, and pending rubric evaluations.</p>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Examination</th>
+          <th>Examiner</th>
+          <th>Schedule</th>
+          <th>Status</th>
+          <th>Attempts / Submitted</th>
+          <th>Avg MCQ</th>
+          <th>Pending Descriptive</th>
+        </tr>
+      </thead>
+      <tbody id="admin-exams-tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Audit Activity Panel -->
+<section id="admin-panel-audit" class="card hidden">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">Security &amp; Platform Audit Log</h2>
+      <p class="card-subtitle">Immutable trail of authentication, exam publishing, submissions, and administrative actions.</p>
+    </div>
+    <div class="flex items-center gap-2 flex-wrap">
+      <select id="admin-audit-role-filter" class="form-select" style="width:auto;" aria-label="Filter logs by actor role">
+        <option value="">All Actor Roles</option>
+        <option value="student">Student</option>
+        <option value="examiner">Examiner</option>
+        <option value="admin">Admin</option>
+      </select>
+      <input id="admin-audit-action-filter" type="search" class="form-input" style="width:210px;" placeholder="Filter action (e.g. EXAM_)..." aria-label="Filter audit logs by action">
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Actor</th>
+          <th>Action</th>
+          <th>Target</th>
+          <th>Metadata</th>
+        </tr>
+      </thead>
+      <tbody id="admin-audit-tbody"></tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_scripts %}
+<script type="module" src="{{ url_for('static', filename='js/pages/adminDashboard.js') }}"></script>
+{% endblock %}
+

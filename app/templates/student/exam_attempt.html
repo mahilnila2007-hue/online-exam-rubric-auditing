@@ -1,0 +1,70 @@
+{% extends "base_exam.html" %}
+{% block title %}Examination Session · {{ app_short_name }}{% endblock %}
+
+{% block exam_header %}
+<div class="flex items-center gap-3" style="min-width:0;">
+  <div class="brand-mark" style="width:34px;height:34px;font-size:0.85rem;">RA</div>
+  <div style="min-width:0;">
+    <div id="attempt-exam-title" class="fw-semibold" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Loading Examination...</div>
+    <div id="attempt-exam-meta" class="text-xs text-muted">{{ user.full_name }} · {{ user.institution_id }}</div>
+  </div>
+</div>
+
+<div class="flex items-center gap-3 flex-wrap">
+  <span id="autosave-indicator" class="badge badge-neutral">Initializing session...</span>
+  <div id="exam-timer-pill" class="timer-pill" aria-live="polite">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span id="exam-timer-value">--:--</span>
+  </div>
+  <button type="button" id="header-submit-btn" class="btn btn-success">Submit Exam</button>
+</div>
+{% endblock %}
+
+{% block content %}
+<section id="question-stage-card" class="card question-stage">
+  <div class="skeleton" style="height:28px;width:45%;margin-bottom:16px;"></div>
+  <div class="skeleton" style="height:80px;margin-bottom:18px;"></div>
+  <div class="skeleton" style="height:180px;"></div>
+</section>
+
+<aside class="card" style="position:sticky;top:88px;">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title" style="font-size:0.95rem;">Question Navigator</h2>
+      <p id="palette-progress-text" class="card-subtitle">0 of 0 answered</p>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="progress-track mb-3" aria-hidden="true">
+      <div id="attempt-progress-fill" class="progress-fill" style="width:0%;"></div>
+    </div>
+
+    <div class="tabs mb-3" id="palette-filter-tabs" style="width:100%;display:grid;grid-template-columns:repeat(3,1fr);">
+      <button type="button" class="tab-btn active" data-palette-filter="all">All</button>
+      <button type="button" class="tab-btn" data-palette-filter="unanswered">Unanswered</button>
+      <button type="button" class="tab-btn" data-palette-filter="flagged">Flagged</button>
+    </div>
+
+    <div id="question-palette" class="palette-grid mb-4"></div>
+
+    <div class="flex flex-wrap gap-2 text-xs text-secondary" style="border-top:1px solid var(--border-default);padding-top:0.85rem;">
+      <span class="flex items-center gap-1"><span style="width:10px;height:10px;border-radius:3px;background:var(--brand-accent);display:inline-block;"></span> Current</span>
+      <span class="flex items-center gap-1"><span style="width:10px;height:10px;border-radius:3px;background:var(--success-soft);border:1px solid var(--success-border);display:inline-block;"></span> Answered</span>
+      <span class="flex items-center gap-1"><span style="width:10px;height:10px;border-radius:3px;background:var(--bg-surface);border:1px solid var(--border-strong);display:inline-block;"></span> Unanswered</span>
+      <span class="flex items-center gap-1"><span style="width:8px;height:8px;border-radius:50%;background:var(--warning);display:inline-block;"></span> Flagged</span>
+    </div>
+    <p class="text-xs text-muted mt-2 mb-0">Shortcuts: <span class="mono">Alt+P</span> Prev · <span class="mono">Alt+N</span> Next</p>
+
+    <div class="mt-4">
+      <button type="button" id="sidebar-save-btn" class="btn btn-secondary btn-sm" style="width:100%;">Save Progress Now</button>
+    </div>
+  </div>
+</aside>
+
+<script id="attempt-page-state" type="application/json">{{ {"examId": exam_id} | tojson }}</script>
+{% endblock %}
+
+{% block page_scripts %}
+<script type="module" src="{{ url_for('static', filename='js/pages/examAttempt.js') }}"></script>
+{% endblock %}
+

@@ -1,0 +1,19 @@
+{% extends "base_app.html" %}
+{% block title %}Rubric Evaluation Studio · {{ app_short_name }}{% endblock %}
+{% block page_heading %}Rubric-Based Answer Evaluation{% endblock %}
+
+{% block content %}
+<div id="eval-workspace-root">
+  <div class="card card-body">
+    <div class="skeleton" style="height:36px;width:55%;margin-bottom:16px;"></div>
+    <div class="skeleton" style="height:220px;"></div>
+  </div>
+</div>
+
+<script id="eval-workspace-state" type="application/json">{{ {"submissionId": submission_id} | tojson }}</script>
+{% endblock %}
+
+{% block page_scripts %}
+<script type="module" src="{{ url_for('static', filename='js/pages/evaluateSubmission.js') }}"></script>
+{% endblock %}
+

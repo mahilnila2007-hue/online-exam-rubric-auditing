@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="exam-shell">
+  <header class="exam-topbar">
+    {% block exam_header %}{% endblock %}
+  </header>
+  <main class="exam-workspace">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% block page_scripts %}{% endblock %}
+{% endblock %}
+

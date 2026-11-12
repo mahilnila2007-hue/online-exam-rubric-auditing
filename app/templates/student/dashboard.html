@@ -1,0 +1,99 @@
+{% extends "base_app.html" %}
+{% block title %}Student Dashboard · {{ app_short_name }}{% endblock %}
+{% block page_heading %}Student Examination Portal{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Welcome, {{ user.full_name }}</h1>
+    <p>View active and scheduled examinations, resume in-progress attempts, or check your assessment history.</p>
+  </div>
+  <div class="flex items-center gap-2">
+    <a href="{{ url_for('pages.student_results_page') }}" class="btn btn-secondary">Published Results</a>
+    <a href="{{ url_for('pages.exam_history_page') }}" class="btn btn-secondary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 3"/></svg>
+      <span>Exam History</span>
+    </a>
+  </div>
+</div>
+
+<div id="student-notifications-banner" class="mb-4"></div>
+
+<section class="kpi-grid mb-6" id="student-kpis">
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Live Now</div>
+      <div class="kpi-value" id="kpi-live">—</div>
+      <div class="kpi-meta">Ready to start or resume</div>
+    </div>
+    <div class="kpi-icon kpi-icon-green">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Upcoming</div>
+      <div class="kpi-value" id="kpi-upcoming">—</div>
+      <div class="kpi-meta">Scheduled future sessions</div>
+    </div>
+    <div class="kpi-icon kpi-icon-blue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Completed</div>
+      <div class="kpi-value" id="kpi-completed">—</div>
+      <div class="kpi-meta">Submitted assessments</div>
+    </div>
+    <div class="kpi-icon kpi-icon-violet">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Total Visible</div>
+      <div class="kpi-value" id="kpi-total">—</div>
+      <div class="kpi-meta">Published examinations</div>
+    </div>
+    <div class="kpi-icon kpi-icon-amber">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    </div>
+  </div>
+</section>
+
+<div class="card">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">Examinations</h2>
+      <p class="card-subtitle">Filter by availability status to begin or review an examination.</p>
+    </div>
+    <div class="flex items-center gap-3 flex-wrap">
+      <input id="student-exam-search" type="search" class="form-input" style="width:220px;" placeholder="Search exams or course..." aria-label="Search examinations">
+      <div class="tabs" id="student-exam-tabs">
+        <button type="button" class="tab-btn active" data-filter="all">All</button>
+        <button type="button" class="tab-btn" data-filter="live">Live Now</button>
+        <button type="button" class="tab-btn" data-filter="upcoming">Upcoming</button>
+        <button type="button" class="tab-btn" data-filter="ended">Closed</button>
+      </div>
+      <button type="button" id="refresh-exams-btn" class="btn btn-secondary btn-sm">Refresh</button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div id="student-exams-container" class="exam-cards-grid">
+      <div class="skeleton" style="height:210px;"></div>
+      <div class="skeleton" style="height:210px;"></div>
+      <div class="skeleton" style="height:210px;"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script type="module" src="{{ url_for('static', filename='js/pages/studentDashboard.js') }}"></script>
+{% endblock %}
+

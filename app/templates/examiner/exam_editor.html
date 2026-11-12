@@ -1,0 +1,203 @@
+{% extends "base_app.html" %}
+{% block title %}{% if mode == 'edit' %}Edit Examination{% else %}Create Examination{% endif %} · {{ app_short_name }}{% endblock %}
+{% block page_heading %}{% if mode == 'edit' %}Edit Examination{% else %}Create Examination{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{% if mode == 'edit' %}Edit Examination{% else %}Create New Examination{% endif %}</h1>
+    <p>Configure scheduling windows, instructions, Phase 3 rubric audit flags, and select questions from your bank.</p>
+  </div>
+  <div class="flex items-center gap-2">
+    <a href="{{ url_for('pages.examiner_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+  </div>
+</div>
+
+<form id="exam-editor-form" novalidate>
+  <div class="editor-split">
+    <!-- Left Column: Metadata & Scheduling -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Examination Configuration</h2>
+          <p class="card-subtitle">Define course details, active window, duration, and rules.</p>
+        </div>
+        <span class="badge badge-brand" id="exam-live-marks-badge">0 Marks · 0 Questions</span>
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="form-group span-2">
+            <label class="form-label" for="exam-title">Examination Title <span class="form-required">*</span></label>
+            <input id="exam-title" name="title" type="text" class="form-input" placeholder="e.g., CS401 Midterm Assessment — Distributed Systems" required>
+            <div class="form-error" data-error-for="title"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="exam-course">Course Code <span class="form-required">*</span></label>
+            <input id="exam-course" name="course_code" type="text" class="form-input mono" placeholder="e.g., CS401" required>
+            <div class="form-error" data-error-for="course_code"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="exam-status">Publication Status</label>
+            <select id="exam-status" name="status" class="form-select">
+              <option value="draft">Draft (Hidden from Students)</option>
+              <option value="scheduled">Scheduled (Visible, opens at Start Time)</option>
+              <option value="published">Published (Active during Window)</option>
+            </select>
+            <div class="form-error" data-error-for="status"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="exam-start">Scheduled Start <span class="form-required">*</span></label>
+            <input id="exam-start" name="scheduled_start" type="datetime-local" class="form-input" required>
+            <div class="form-error" data-error-for="scheduled_start"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="exam-end">Scheduled End <span class="form-required">*</span></label>
+            <input id="exam-end" name="scheduled_end" type="datetime-local" class="form-input" required>
+            <div class="form-error" data-error-for="scheduled_end"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="exam-duration">Duration (minutes) <span class="form-required">*</span></label>
+            <input id="exam-duration" name="duration_minutes" type="number" min="5" max="480" value="60" class="form-input" required>
+            <div class="form-error" data-error-for="duration_minutes"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="exam-passing">Passing Marks <span class="form-required">*</span></label>
+            <input id="exam-passing" name="passing_marks" type="number" min="0" step="0.5" value="0" class="form-input" required>
+            <div class="form-error" data-error-for="passing_marks"></div>
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label" for="exam-description">Overview / Syllabus Scope</label>
+            <textarea id="exam-description" name="description" class="form-textarea" rows="2" placeholder="Topics covered, permitted materials, and assessment overview..."></textarea>
+            <div class="form-error" data-error-for="description"></div>
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label" for="exam-instructions">Candidate Instructions (one rule per line)</label>
+            <textarea id="exam-instructions" name="instructions" class="form-textarea" rows="4" placeholder="Read each question carefully before submitting.&#10;Descriptive answers are graded using predefined analytical rubrics.&#10;The exam auto-submits when the timer reaches 00:00."></textarea>
+            <div class="form-error" data-error-for="instructions"></div>
+          </div>
+
+          <div class="form-group span-2">
+            <div class="flex flex-wrap gap-3">
+              <label class="checkbox-row" style="flex:1;min-width:200px;">
+                <input type="checkbox" name="shuffle_questions" id="exam-shuffle">
+                <div>
+                  <div class="fw-semibold text-sm">Shuffle Question Order</div>
+                  <div class="text-xs text-muted">Randomizes sequence per student</div>
+                </div>
+              </label>
+
+              <label class="checkbox-row" style="flex:1;min-width:200px;">
+                <input type="checkbox" name="allow_review_after_submit" id="exam-review" checked>
+                <div>
+                  <div class="fw-semibold text-sm">Allow Post-Submit Review</div>
+                  <div class="text-xs text-muted">Shows answers after completion</div>
+                </div>
+              </label>
+
+              <label class="checkbox-row" style="flex:1;min-width:200px;">
+                <input type="checkbox" name="rubric_audit_enabled" id="exam-audit" checked>
+                <div>
+                  <div class="fw-semibold text-sm">Enable Rubric Auditing</div>
+                  <div class="text-xs text-muted">Marks descriptive answers for Phase 3 NLP audit</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Phase 2: MCQ Negative Marking & Grade Rules -->
+          <div class="form-group span-2" style="border-top:1px solid var(--border-default);padding-top:1rem;margin-top:0.25rem;">
+            <div class="form-grid">
+              <label class="checkbox-row">
+                <input type="checkbox" name="negative_marking_enabled" id="exam-neg-marking">
+                <div>
+                  <div class="fw-semibold text-sm">Enable MCQ Negative Marking</div>
+                  <div class="text-xs text-muted">Deducts fraction of question marks for incorrect MCQ selections</div>
+                </div>
+              </label>
+              <div class="form-group" id="neg-fraction-group">
+                <label class="form-label" for="exam-neg-fraction">Wrong Answer Penalty Fraction</label>
+                <select id="exam-neg-fraction" name="negative_mark_fraction" class="form-select" disabled>
+                  <option value="0.25">0.25 (1/4th mark penalty)</option>
+                  <option value="0.33">0.33 (1/3rd mark penalty)</option>
+                  <option value="0.5">0.50 (1/2 mark penalty)</option>
+                  <option value="1">1.00 (Full mark penalty)</option>
+                </select>
+                <div class="form-error" data-error-for="negative_mark_fraction"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group span-2">
+            <div class="flex items-center justify-between mb-2">
+              <label class="form-label" style="margin:0;">Configurable Grade Boundaries (%)</label>
+              <button type="button" id="add-grade-rule-btn" class="btn btn-secondary btn-sm">+ Add Grade</button>
+            </div>
+            <div class="form-error mb-1" data-error-for="grade_rules"></div>
+            <div id="grade-rules-container" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.55rem;"></div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 mt-6">
+          <a href="{{ url_for('pages.examiner_dashboard') }}" class="btn btn-secondary">Cancel</a>
+          <button type="submit" id="save-exam-btn" class="btn btn-primary btn-lg">
+            {% if mode == 'edit' %}Save Changes{% else %}Save Examination{% endif %}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Question Bank Picker -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Select Questions</h2>
+          <p class="card-subtitle">Choose MCQ and rubric-backed descriptive questions.</p>
+        </div>
+        <a href="{{ url_for('pages.question_bank_page') }}" class="btn btn-secondary btn-sm">+ Manage Bank</a>
+      </div>
+      <div class="card-body">
+        <div class="flex gap-2 mb-3 flex-wrap items-center">
+          <input id="picker-search" type="search" class="form-input" placeholder="Search prompt, set, subject..." style="flex:1;min-width:140px;">
+          <select id="picker-set-filter" class="form-select" style="width:auto;">
+            <option value="">All Sets</option>
+          </select>
+          <select id="picker-marks-filter" class="form-select" style="width:auto;">
+            <option value="">All Marks</option>
+            <option value="1">1 Mark</option>
+            <option value="2">2 Marks</option>
+            <option value="5">5 Marks</option>
+          </select>
+          <select id="picker-type-filter" class="form-select" style="width:auto;">
+            <option value="">All Types</option>
+            <option value="mcq">MCQ</option>
+            <option value="descriptive">Descriptive</option>
+          </select>
+          <button type="button" id="picker-select-visible-btn" class="btn btn-secondary btn-sm">Select Visible</button>
+        </div>
+
+        <div class="form-error mb-2" data-error-for="question_ids"></div>
+
+        <div id="question-picker-list" class="picker-list">
+          <div class="skeleton" style="height:76px;"></div>
+          <div class="skeleton" style="height:76px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script id="exam-editor-state" type="application/json">{{ {"mode": mode, "examId": exam_id} | tojson }}</script>
+{% endblock %}
+
+{% block page_scripts %}
+<script type="module" src="{{ url_for('static', filename='js/pages/examEditor.js') }}"></script>
+{% endblock %}
+

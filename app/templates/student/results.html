@@ -1,0 +1,75 @@
+{% extends "base_app.html" %}
+{% block title %}Published Results · {{ app_short_name }}{% endblock %}
+{% block page_heading %}Official Examination Results{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Published Examination Results</h1>
+    <p>Review finalized grades, pass/fail outcomes, examiner feedback, and rubric score breakdowns.</p>
+  </div>
+  <div class="flex items-center gap-2">
+    <a href="{{ url_for('pages.exam_history_page') }}" class="btn btn-secondary">Exam History</a>
+  </div>
+</div>
+
+<div id="student-notifications-banner" class="mb-4"></div>
+
+<section class="kpi-grid mb-6">
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Published Results</div>
+      <div class="kpi-value" id="res-kpi-total">—</div>
+      <div class="kpi-meta">Released by examiners</div>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Passed Exams</div>
+      <div class="kpi-value" id="res-kpi-passed">—</div>
+      <div class="kpi-meta">Meeting passing marks</div>
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div>
+      <div class="kpi-label">Average Score</div>
+      <div class="kpi-value" id="res-kpi-avg">—</div>
+      <div class="kpi-meta">Across published assessments</div>
+    </div>
+  </div>
+</section>
+
+<div class="card">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">Examination-Wise Result History</h2>
+      <p class="card-subtitle">Only results formally published by your examiner appear below.</p>
+    </div>
+    <button type="button" id="res-refresh-btn" class="btn btn-secondary btn-sm">Refresh</button>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Examination</th>
+          <th>MCQ</th>
+          <th>Descriptive</th>
+          <th>Obtained / Total</th>
+          <th>Percentage</th>
+          <th>Grade</th>
+          <th>Outcome</th>
+          <th style="text-align:right;">Report</th>
+        </tr>
+      </thead>
+      <tbody id="student-results-tbody">
+        <tr><td colspan="8"><div class="skeleton" style="height:44px;"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script type="module" src="{{ url_for('static', filename='js/pages/studentResults.js') }}"></script>
+{% endblock %}
+
